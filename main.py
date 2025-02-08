@@ -1,60 +1,61 @@
-import requests
-from bs4 import BeautifulSoup
-from transformers import pipeline
-import argparse
+import transformers
+
+#define a model id. In huggingface it is formated as user_name/model_name. 
+model_id = "Qwen/Qwen2.5-3B-Instruct"
+
+"""
+define the generation pipeline. this includes:
+1. the objective of the ai model (text generation)
+2. the model id (in our case, Qwen2.5-3B-Instruct)
+3. which device to run the model. Its best to use a graphics card if available
+"""
+
+pipe = transformers.pipeline(
+    "text-generation",
+    model=model_id,
+    device_map="auto",
+)
 
 
-parser = argparse.ArgumentParser(description="Summarizer for congressional bills.")
-parser.add_argument("--congress", type=int, required=False, help="Congress session number (ex. 118)", default=118)
-parser.add_argument("--bill_type", type=str, required=False, help="Type of bill (ex. 'hr' for House Resolution)", default="hr")
-parser.add_argument("--bill_number", type=int, required=False, help="Bill number (ex. 3342)", default=3342)
-parser.add_argument("--summary_length", type=int, required=False, help="The maximum length (in tokens) to generate. (ex. 512)", default=512)
-parser.add_argument("--language", type=str, required=False, help="Language to summarize in", default="english")
-args = parser.parse_args()
+#define a system prompt
+system_prompt = "You are a helpful assistant."
 
-api_key = "lcEPkwR1hbjGj7BH1dIedohAgDpoEuwkxizO154X"
+#format the system prompt as a dictionary. 
+system_prompt = {"role": "system", "content": system_prompt}
 
-def get_bill_text(congress, bill_type, bill_number):
-    base_url = "https://api.congress.gov/v3/bill/"
-    endpoint = f"{base_url}{congress}/{bill_type}/{bill_number}/text?api_key={api_key}"
+#create a list representing all previous messages in the conversation apply the system prompt.
+messages = [system_prompt]
 
-    headers = {"Accept": "application/json"}
-    response = requests.get(endpoint, headers=headers)
+while True:
+    #ask the user for a prompt
+    prompt = input("Prompt: ")
 
-    if response.status_code == 200:
-        data = response.json()
-        text_versions = data.get("textVersions", [])
+    #if the prompt is 'exit', halt the loop
+    if prompt == "exit":
+        break
+        
+    #otherwise, format the prompt as a dictionary.
+    prompt = {"role": "user", "content": prompt}
 
-        if not text_versions:
-            return "No text versions available for this bill."
+    #add the prompt into a list containing all the previous information
+    messages.append(prompt)
 
-        text_url = None
-        for version in text_versions:
-            for format in version["formats"]:
-                if format["type"] == "Formatted Text":
-                    text_url = format["url"]
-                    break
+    #generate the response given the previous messages and the prompt
+    outputs = pipe(
+        messages,
+        max_new_tokens=256,
+    )
 
-        if not text_url:
-            return "Formatted text version not found."
+    #remove the format the response is in, and turn it into a string
+    outputs = outputs[0]["generated_text"][-1]["content"]
 
-        text_response = requests.get(text_url)
-        if text_response.status_code == 200:
-            soup = BeautifulSoup(text_response.text, "html.parser")
-            return soup.get_text()
-        else:
-            return f"Error: Unable to fetch bill (Status Code: {text_response.status_code})"
+    #print the respone
+    print("Response: ", outputs)
 
-    else:
-        return f"Error: Unable to fetch bill data (Status Code: {response.status_code})"
+    #format the response into a dictionary
+    outputs = {"role": "assistant", "content": outputs}
 
-raw_text = get_bill_text(congress=args.congress, bill_type=args.bill_type, bill_number=args.bill_number)
+    #add the response to the list of all previous messages
+    messages.append(outputs)
 
-summarizer = pipeline("text-generation", model="Qwen/Qwen2.5-3B-Instruct", trust_remote_code=True)
-
-def summarize_text(text):
-    prompt = f"Write a short summary of the following congressional bill in {args.language} :\n\n{text}"
-    result = summarizer(prompt, max_new_tokens=args.summary_length)
-    return result[0]["generated_text"]
-
-print(summarize_text(raw_text))
+    #repeat until the user's prompt is exit
