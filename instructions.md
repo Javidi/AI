@@ -10,18 +10,16 @@ If your local computer does not have adequite storage or memory, please utilize 
 
 Steps for Windows: 
 
-1. Open a powershell terminal in the directory of the project
-2. run the command to initialize: ```. .\windows_setup.ps1```
-3. look inside the 'chat.py' file for details of the code you will be running
-4. run the command to open the chat interface: ```python chat.py```
+1. run the command to initialize: ```. .\windows_setup.ps1```
+2. look inside the 'chat.py' file for details of the code you will be running
+3. run the command to open the chat interface: ```python chat.py```
 
 ---------------------------------------------------------------------------------
 
 Steps for Mac/Linux: 
 
-1. Open a terminal in the directory of the project
-2. run the command to initialize: ```source mac_setup.sh```
-3. look inside the 'chat.py' file for details of the code you will be running
-4. run the command to open the chat interface: ```python3 chat.py```
+1. run the command to initialize: ```source mac_setup.sh```
+2. look inside the 'chat.py' file for details of the code you will be running
+3. run the command to open the chat interface: ```python3 chat.py```
 
 ---------------------------------------------------------------------------------
