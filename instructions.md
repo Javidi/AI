@@ -24,7 +24,16 @@ Steps for Mac/Linux:
 
 ---------------------------------------------------------------------------------
 
-You do not need to run the setup more than once. If you see a folder called "venv", and see (venv) to the left of your terminal line,
-then it is working as expected. When you want to use this again, simply source the venv (virtual environment)
+You do not need to run the setup more than once. If you see a folder called "venv", then it is working as expected.
 
+if you do NOT see (venv) to the left of your terminal, or have closed and re-opened your terminal, you must source it again:
 
+to source the virtual environment:
+
+Windows:
+
+```venv\Scripts\activate```
+
+Mac/Linux:
+
+```source venv/bin/activate```
