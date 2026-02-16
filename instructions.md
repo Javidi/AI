@@ -23,3 +23,8 @@ Steps for Mac/Linux:
 3. run the command to open the chat interface: ```python3 chat.py```
 
 ---------------------------------------------------------------------------------
+
+You do not need to run the setup more than once. If you see a folder called "venv", and see (venv) to the left of your terminal line,
+then it is working as expected. When you want to use this again, simply source the venv (virtual environment)
+
+
